@@ -21,55 +21,54 @@ function ReadKeys() {
         alt.log('pressed O')
 }
 
+let somePing
+
 function NoClip() {
     alt.log('im in noclip')
     if(bNoClip === false) {
         bNoClip = true
         native.freezeEntityPosition(alt.Player.local.scriptID, true)
-        ExecNoClip()
+        //ExecNoClip()
+        somePing = alt.everyTick(PingNoClip)
     } else if (bNoClip === true) {
+        alt.log('setting noclip to false')
+        alt.clearEveryTick(somePing)
         bNoClip = false
         native.freezeEntityPosition(alt.Player.local.scriptID, false)
+        alt.emitServer("noclip:disabled")
     }
 }
 
-function ExecNoClip() {
-    alt.log('im in execnoclip')
-    alt.everyTick(PingNoclip)
-}
-
-function PingNoclip() {
+function PingNoClip() {
     let currentPos = alt.Player.local.pos
     let speed = 3
     let rot = native.getGameplayCamRot(2)
-    let fwd  = CamForward(rot)
-    let rght = CamRight(rot)
-    let zMod: number = 0
+    let forward  = CamForward(rot)
+    let right = CamRight(rot)
+    //alt.log('pinging noclip')
     
-    if (alt.isKeyDown('SHIFT'.charCodeAt(0)))
+    if (alt.isKeyDown('Z'.charCodeAt(0)))
         speed = speed * 5
+    if (alt.isKeyDown('X'.charCodeAt(0)))
+        speed = speed / 2
     if (alt.isKeyDown('W'.charCodeAt(0)))
-        currentPos = ChangePos(currentPos, fwd, speed)
+        currentPos = ChangePos(currentPos, forward, speed)
     if (alt.isKeyDown('S'.charCodeAt(0)))
-        currentPos = ChangePos(currentPos, fwd, -speed )
+        currentPos = ChangePos(currentPos, forward, -speed )
     if (alt.isKeyDown('A'.charCodeAt(0)))
-        currentPos = ChangePos(currentPos, rght, -speed, true)
+        currentPos = ChangePos(currentPos, right, -speed, true)
     if (alt.isKeyDown('D'.charCodeAt(0)))
-        currentPos = ChangePos(currentPos, rght, speed, true)
-    if (alt.isKeyDown('UpArr'.charCodeAt(0)))
-        zMod += speed
-    if (alt.isKeyDown('DownArr'.charCodeAt(0)))
-        zMod -= speed
+        currentPos = ChangePos(currentPos, right, speed, true)
 
-    if (!isVEq(new alt.Vector3(currentPos.x, currentPos.y, currentPos.z + zMod), alt.Player.local.pos))   
-        alt.emitServer("noclip:set", currentPos.x, currentPos.y, currentPos.z + zMod)
+    if (!isVEq(new alt.Vector3(currentPos.x, currentPos.y, currentPos.z), alt.Player.local.pos))   
+        alt.emitServer("noclip:set", currentPos.x, currentPos.y, currentPos.z)
 }
 
 function ChangePos(vector1, vector2, speed:number, lr = false) {
     return new alt.Vector3(
         vector1.x + vector2.x * speed,
         vector1.y + vector2.y * speed,
-        lr === true ? vector1.z : vector1.z + vector2.z * speed
+        lr === true ? vector1.z : vector1.z + vector2.z * speed,
     )
 }
 
