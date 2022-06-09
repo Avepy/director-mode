@@ -39,7 +39,7 @@ function ReadKeys() {
     }
 }
 
-let noclipTick
+let noclipTick: number // interval from HandlingClipMovement
 
 function NoClip() {
     alt.log('im in noclip')
