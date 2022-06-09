@@ -25,12 +25,12 @@ function ReadKeys() {
     // key O ((playing with cam))
     if (alt.isKeyDown('O'.charCodeAt(0)) && !bK_KeyDown) {
         bK_KeyDown = true
-        //native.renderScriptCams(false, true, 5000, false, false, 0)
         PlayCam()
         camIndex = 0
         setTimeout(() => bK_KeyDown = false, 500)
         alt.log('pressed O')
     } 
+    // key J ((clearing save-points))
     if (alt.isKeyDown('J'.charCodeAt(0)) && !dk_KeyDown) {
         dk_KeyDown = true
         camArr = []
@@ -46,10 +46,8 @@ function NoClip() {
     if(bNoClip === false) {
         bNoClip = true
         native.freezeEntityPosition(alt.Player.local.scriptID, true)
-        //ExecNoClip()
         somePing = alt.everyTick(PingNoClip)
     } else if (bNoClip === true) {
-        alt.log('setting noclip to false')
         alt.clearEveryTick(somePing)
         bNoClip = false
         native.freezeEntityPosition(alt.Player.local.scriptID, false)
@@ -63,7 +61,6 @@ function PingNoClip() {
     let rot = native.getGameplayCamRot(2)
     let forward  = CamForward(rot)
     let right = CamRight(rot)
-    //alt.log('pinging noclip')
     
     if (alt.isKeyDown('Z'.charCodeAt(0)))
         speed = speed * 5
@@ -132,7 +129,6 @@ function isVEq(v1, v2) {
 
 function SaveCam() {
     if(camArr.length < 10) {
-        //execute script
         let camCoords = native.getGameplayCamCoord()
         let camRot = native.getGameplayCamRot(2)
         let camFov = native.getGameplayCamFov()
