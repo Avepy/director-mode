@@ -2,7 +2,7 @@ import * as alt from 'alt-client'
 import * as native from 'natives'
 let bNoClip: boolean = false
 let bB_KeyDown: boolean = false, bO_KeyDown: boolean = false, bK_KeyDown: boolean = false, dk_KeyDown: boolean = false
-let camArr = []
+let camArr: Cam[] = []
 type Cam = number
 
 alt.everyTick(ReadKeys)
@@ -39,9 +39,9 @@ function ReadKeys() {
     }
 }
 
-let noclipTick: number // interval from HandlingClipMovement
+let noclipTick: number // interval for HandleNoClipMovement
 
-function NoClip() {
+function NoClip():void {
     alt.log('im in noclip')
     if(bNoClip === false) {
         bNoClip = true
@@ -55,7 +55,7 @@ function NoClip() {
     }
 }
 
-function HandleNoClipMovement() {
+function HandleNoClipMovement():void {
     let currentPos = alt.Player.local.pos
     let speed = 3
     let rot = native.getGameplayCamRot(2)
@@ -79,7 +79,7 @@ function HandleNoClipMovement() {
         alt.emitServer("noclip:set", currentPos.x, currentPos.y, currentPos.z)
 }
 
-function ChangePos(vector1, vector2, speed:number, lr = false) {
+function ChangePos(vector1, vector2, speed:number, lr = false):alt.Vector3 {
     return new alt.Vector3(
         vector1.x + vector2.x * speed,
         vector1.y + vector2.y * speed,
@@ -87,7 +87,13 @@ function ChangePos(vector1, vector2, speed:number, lr = false) {
     )
 }
 
-function CamForward(cRot) {
+interface Rotator {
+    x: number,
+    y: number,
+    z: number,
+}
+
+function CamForward(cRot):Rotator {
     let rotRad = {
         x: cRot.x * (Math.PI / 180),
         y: cRot.y * (Math.PI / 180),
@@ -127,7 +133,7 @@ function isVEq(v1, v2) {
     )
 }
 
-function SaveCam() {
+function SaveCam():void {
     if(camArr.length < 10) {
         let camCoords = native.getGameplayCamCoord()
         let camRot = native.getGameplayCamRot(2)
@@ -141,9 +147,9 @@ function SaveCam() {
 }
 
 let camIndex: number = 0
-let intervalRef: any
+let intervalRef: NodeJS.Timer //interval between switching cams
 
-function PlayCam() {
+function PlayCam():void {
     if (camArr.length > 0) {
         intervalRef = setInterval(() => {
             if (camIndex < camArr.length - 1) {
