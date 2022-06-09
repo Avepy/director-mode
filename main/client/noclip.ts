@@ -94,13 +94,13 @@ interface Rotator {
 }
 
 function CamForward(cRot):Rotator {
-    let rotRad = {
+    let rotRad:Rotator = {
         x: cRot.x * (Math.PI / 180),
         y: cRot.y * (Math.PI / 180),
         z: cRot.z * (Math.PI / 180) + Math.PI / 2,
     }
 
-    let cDir = {
+    let cDir:Rotator = {
         x: Math.cos(rotRad.z),
         y: Math.sin(rotRad.z),
         z: Math.sin(rotRad.x),
@@ -109,14 +109,14 @@ function CamForward(cRot):Rotator {
     return cDir
 }
 
-function CamRight(cRot) {
-    let rotRad = {
+function CamRight(cRot):Rotator {
+    let rotRad:Rotator = {
         x: cRot.x * (Math.PI / 180),
         y: cRot.y * (Math.PI / 180),
         z: cRot.z * (Math.PI / 180),
     }
 
-    var cDir = {
+    var cDir:Rotator = {
         x: Math.cos(rotRad.z),
         y: Math.sin(rotRad.z),
         z: Math.sin(rotRad.x),
@@ -125,7 +125,7 @@ function CamRight(cRot) {
     return cDir
 }
 
-function isVEq(v1, v2) {
+function isVEq(v1, v2):boolean {
     return (
         v1.x === v2.x &&
         v1.y === v2.y &&
