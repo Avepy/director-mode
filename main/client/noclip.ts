@@ -27,6 +27,7 @@ function ReadKeys() {
         bK_KeyDown = true
         //native.renderScriptCams(false, true, 5000, false, false, 0)
         PlayCam()
+        camIndex = 0
         setTimeout(() => bK_KeyDown = false, 500)
         alt.log('pressed O')
     } 
