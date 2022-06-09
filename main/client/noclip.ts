@@ -1,7 +1,9 @@
 import * as alt from 'alt-client'
 import * as native from 'natives'
 let bNoClip: boolean = false
-let bB_KeyDown: boolean = false, bO_KeyDown: boolean = false
+let bB_KeyDown: boolean = false, bO_KeyDown: boolean = false, bK_KeyDown: boolean = false, dk_KeyDown: boolean = false
+let camArr = []
+type Cam = number
 
 alt.everyTick(ReadKeys)
 
@@ -14,11 +16,26 @@ function ReadKeys() {
         alt.log('pressed L')
     }  
     // key H ((save-points))
-    if (alt.isKeyDown('H'.charCodeAt(0)))
+    if (alt.isKeyDown('H'.charCodeAt(0)) && !bO_KeyDown) {
+        bO_KeyDown = true
+        SaveCam()
+        setTimeout(() => bO_KeyDown = false, 500)
         alt.log('pressed H')
+    }
     // key O ((playing with cam))
-    if (alt.isKeyDown('O'.charCodeAt(0)))
+    if (alt.isKeyDown('O'.charCodeAt(0)) && !bK_KeyDown) {
+        bK_KeyDown = true
+        //native.renderScriptCams(false, true, 5000, false, false, 0)
+        PlayCam()
+        setTimeout(() => bK_KeyDown = false, 500)
         alt.log('pressed O')
+    } 
+    if (alt.isKeyDown('J'.charCodeAt(0)) && !dk_KeyDown) {
+        dk_KeyDown = true
+        camArr = []
+        setTimeout(() => dk_KeyDown = false, 500)
+        alt.log('pressed J')
+    }
 }
 
 let somePing
@@ -110,4 +127,39 @@ function isVEq(v1, v2) {
         v1.y === v2.y &&
         v1.z === v2.z
     )
+}
+
+function SaveCam() {
+    if(camArr.length < 10) {
+        //execute script
+        let camCoords = native.getGameplayCamCoord()
+        let camRot = native.getGameplayCamRot(2)
+        let camFov = native.getGameplayCamFov()
+        let camera: Cam = native.createCamWithParams("DEFAULT_SCRIPTED_CAMERA", camCoords.x, camCoords.y, camCoords.z, camRot.x, camRot.y, camRot.z, camFov, false, 0)
+        camArr.push(camera)
+        alt.log(camArr)
+    } else {
+        alt.log('Maximum 10 cams in arr')
+    }
+}
+
+let camIndex: number = 0
+let intervalRef: any
+
+function PlayCam() {
+    if (camArr.length > 0) {
+        intervalRef = setInterval(() => {
+            if (camIndex < camArr.length - 1) {
+                native.setCamActiveWithInterp(camArr[camIndex + 1], camArr[camIndex], 3500, 1, 1)
+                native.renderScriptCams(true, true, 1500, false, false, 0)
+                camIndex++;
+            } else {
+                clearInterval(intervalRef)
+                native.stopRenderingScriptCamsUsingCatchUp(false, 0, 0, 0)
+            }
+        }, 3500)
+    } else {
+        alt.log(`Can't play cam without set cam`)
+    }
+    
 }
