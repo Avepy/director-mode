@@ -42,7 +42,6 @@ function ReadKeys() {
 let noclipTick: number // interval for HandleNoClipMovement
 
 function NoClip():void {
-    alt.log('im in noclip')
     if(bNoClip === false) {
         bNoClip = true
         native.freezeEntityPosition(alt.Player.local.scriptID, true)
@@ -140,7 +139,6 @@ function SaveCam():void {
         let camFov = native.getGameplayCamFov()
         let camera: Cam = native.createCamWithParams("DEFAULT_SCRIPTED_CAMERA", camCoords.x, camCoords.y, camCoords.z, camRot.x, camRot.y, camRot.z, camFov, false, 0)
         camArr.push(camera)
-        alt.log(camArr)
     } else {
         alt.log('Maximum 10 cams in arr')
     }
