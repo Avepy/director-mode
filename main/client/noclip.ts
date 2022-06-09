@@ -39,23 +39,23 @@ function ReadKeys() {
     }
 }
 
-let somePing
+let noclipTick
 
 function NoClip() {
     alt.log('im in noclip')
     if(bNoClip === false) {
         bNoClip = true
         native.freezeEntityPosition(alt.Player.local.scriptID, true)
-        somePing = alt.everyTick(PingNoClip)
+        noclipTick = alt.everyTick(HandleNoClipMovement)
     } else if (bNoClip === true) {
-        alt.clearEveryTick(somePing)
+        alt.clearEveryTick(noclipTick)
         bNoClip = false
         native.freezeEntityPosition(alt.Player.local.scriptID, false)
         alt.emitServer("noclip:disabled")
     }
 }
 
-function PingNoClip() {
+function HandleNoClipMovement() {
     let currentPos = alt.Player.local.pos
     let speed = 3
     let rot = native.getGameplayCamRot(2)
