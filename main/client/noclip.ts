@@ -45,11 +45,15 @@ function NoClip():void {
     if(bNoClip === false) {
         bNoClip = true
         native.freezeEntityPosition(alt.Player.local.scriptID, true)
+        native.displayHud(false)
+        native.displayRadar(false)
         noclipTick = alt.everyTick(HandleNoClipMovement)
     } else if (bNoClip === true) {
         alt.clearEveryTick(noclipTick)
         bNoClip = false
         native.freezeEntityPosition(alt.Player.local.scriptID, false)
+        native.displayHud(true)
+        native.displayRadar(true)
         alt.emitServer("noclip:disabled")
     }
 }
