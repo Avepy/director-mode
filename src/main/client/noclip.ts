@@ -4,12 +4,24 @@ import * as native from 'natives';
 let bNoClip: boolean = false;
 let isLKeyDown: boolean = false, isHKeyDown: boolean = false, isOKeyDown: boolean = false, isJKeyDown: boolean = false;
 let camArr: number[] = [];
+const enum ActionKeys {
+    NoClip = 76,
+    SavePoint = 72,
+    CamPlay = 79,
+    ClearPoints = 74,
+    NoClipSpeedUp = 90,
+    NoClipSpeedDown = 88,
+    Forward = 87,
+    Backward = 83,
+    Left = 65,
+    Right = 68
+} 
 
 alt.everyTick(ReadKeys)
 
 function ReadKeys() {
     // key L ((enable noclip))
-    if (alt.isKeyDown('L'.charCodeAt(0)) && !isLKeyDown) {
+    if (alt.isKeyDown(ActionKeys.NoClip) && !isLKeyDown) {
         isLKeyDown = true;
         noClip();
         setTimeout(() => isLKeyDown = false, 500);
@@ -17,7 +29,7 @@ function ReadKeys() {
         return;
     }  
     // key H ((save-points))
-    if (alt.isKeyDown('H'.charCodeAt(0)) && !isHKeyDown) {
+    if (alt.isKeyDown(ActionKeys.SavePoint) && !isHKeyDown) {
         isHKeyDown = true;
         saveCam();
         setTimeout(() => isHKeyDown = false, 500);
@@ -25,7 +37,7 @@ function ReadKeys() {
         return;
     }
     // key O ((playing with cam))
-    if (alt.isKeyDown('O'.charCodeAt(0)) && !isOKeyDown) {
+    if (alt.isKeyDown(ActionKeys.CamPlay) && !isOKeyDown) {
         isOKeyDown = true;
         playCam();
         camIndex = 0;
@@ -34,9 +46,10 @@ function ReadKeys() {
         return;
     } 
     // key J ((clearing save-points))
-    if (alt.isKeyDown('J'.charCodeAt(0)) && !isJKeyDown) {
+    if (alt.isKeyDown(ActionKeys.ClearPoints) && !isJKeyDown) {
         isJKeyDown = true;
         camArr = [];
+        native.destroyAllCams(true);
         setTimeout(() => isJKeyDown = false, 500);
         alt.log('pressed J');
         return;
@@ -69,19 +82,19 @@ function handleNoClipMovement():void {
     let forward  = camForward(rot);
     let right = camRight(rot);
     
-    if (alt.isKeyDown('Z'.charCodeAt(0))) {
+    if (alt.isKeyDown(ActionKeys.NoClipSpeedUp)) {
         speed = speed * 5;
-    } else if (alt.isKeyDown('X'.charCodeAt(0))) {
+    } else if (alt.isKeyDown(ActionKeys.NoClipSpeedDown)) {
         speed = speed / 2;
     } 
     
-    if (alt.isKeyDown('W'.charCodeAt(0))) {
+    if (alt.isKeyDown(ActionKeys.Forward)) {
         currentPos = changePos(currentPos, forward, speed);
-    } else if (alt.isKeyDown('S'.charCodeAt(0))) {
+    } else if (alt.isKeyDown(ActionKeys.Backward)) {
         currentPos = changePos(currentPos, forward, -speed );
-    } else if (alt.isKeyDown('A'.charCodeAt(0))) {
+    } else if (alt.isKeyDown(ActionKeys.Left)) {
         currentPos = changePos(currentPos, right, -speed, true);
-    } else if (alt.isKeyDown('D'.charCodeAt(0))) {
+    } else if (alt.isKeyDown(ActionKeys.Right)) {
         currentPos = changePos(currentPos, right, speed, true);
     }
 
@@ -152,20 +165,19 @@ function saveCam():void {
 }
 
 let camIndex: number = 0;
-let intervalRef: NodeJS.Timer; //interval between switching cams
+let intervalRef: number; //interval between switching cams
 
 function playCam():void {
     if (camArr.length > 0) {
-        intervalRef = setInterval(() => {
+        intervalRef = alt.setInterval(() => {
             if (camIndex < camArr.length - 1) {
                 native.setCamActiveWithInterp(camArr[camIndex + 1], camArr[camIndex], 3500, 1, 1);
                 native.renderScriptCams(true, true, 1500, false, false, 0);
                 camIndex++;
             } else {
-                clearInterval(intervalRef);
+                alt.clearInterval(intervalRef);
                 native.stopRenderingScriptCamsUsingCatchUp(false, 0, 0, 0);
             }
         }, 3500)
-    } else if(camArr.length <= 0) return;
-    
+    } else if(camArr.length <= 0) return;   
 }
